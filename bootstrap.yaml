@@ -1,0 +1,14 @@
+- name: Setup ssh server
+  hosts: localhost
+  connection: local
+
+  tasks:
+    - name: generate new key pairs
+      community.crypto.openssh_keypair:
+        path: "~/.ssh/id_virtualbox"
+        type: ed25519
+    - name: add public key to known hosts
+      ansible.builtin.known_hosts:
+        path: "~/.ssh/known_hosts"
+        name: id_virtualbox
+        key: "{{ lookup('ansible.builtin.file', '~/.ssh/id_virtualbox.pub') }}"
