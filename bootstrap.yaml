@@ -1,14 +1,151 @@
-- name: Setup ssh server
+- name: Setup ssh keys
+  hosts: localhost
+  connection: local
+
+  vars:
+    ssh_key_name: id_virtualbox
+    git_key_name: id_git
+
+  vars_prompt:
+    - name: output_folder
+      prompt: Where to output keys?
+      private: false
+
+  tasks:
+    - name: generate new key pairs for ssh
+      community.crypto.openssh_keypair:
+        path: "~/.ssh/{{ ssh_key_name }}"
+        type: ed25519
+    - name: add public ssh key to known hosts
+      ansible.posix.authorized_key:
+        user: michele
+        key: "{{ lookup('ansible.builtin.file', '~/.ssh/{{ ssh_key_name }}.pub') }}"
+    - name: copy private key to output folder
+      copy:
+        remote_src: true
+        src: '~/.ssh/{{ ssh_key_name }}'
+        dest: "{{ output_folder }}/{{ ssh_key_name }}"
+    - name: generate new key pairs for git
+      community.crypto.openssh_keypair:
+        path: "~/.ssh/{{ git_key_name }}"
+        type: ed25519
+    - name: copy public git key to output folder
+      copy:
+        remote_src: true
+        src: '~/.ssh/{{ git_key_name }}.pub'
+        dest: "{{ output_folder }}/{{ git_key_name }}.pub"
+
+- name: update system
+  hosts: localhost
+  connection: local
+  
+  tasks:
+
+    - name: update & upgrade
+      become: true
+      apt:
+        upgrade: "yes"
+        update_cache: "yes"
+
+- name: install apt packages
   hosts: localhost
   connection: local
 
   tasks:
-    - name: generate new key pairs
-      community.crypto.openssh_keypair:
-        path: "~/.ssh/id_virtualbox"
-        type: ed25519
-    - name: add public key to known hosts
-      ansible.builtin.known_hosts:
-        path: "~/.ssh/known_hosts"
-        name: id_virtualbox
-        key: "{{ lookup('ansible.builtin.file', '~/.ssh/id_virtualbox.pub') }}"
+
+    - name: install utils from apt
+      become: true
+      apt:
+        pkg:
+        - apt-transport-https 
+        - ca-certificates 
+        - curl 
+        - software-properties-common
+        update_cache: "yes"
+
+    - name: add emacs ppa
+      become: true
+      ansible.builtin.apt_repository:
+        repo: ppa:kelleyk/emacs
+
+    - name: add gcloud source
+      become: true
+      ansible.builtin.deb822_repository:
+        name: gloud 
+        types: [deb]
+        uris: "https://packages.cloud.google.com/apt"
+        signed_by: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
+        suites: [cloud-sdk]
+        components: [main]
+        state: present
+        enabled: yes
+
+    - name: add docker source
+      become: true
+      ansible.builtin.deb822_repository:
+        name: docker 
+        types: [deb]
+        uris: "https://download.docker.com/linux/ubuntu"
+        signed_by: "https://download.docker.com/linux/ubuntu/gpg"
+        suites: ["{{ ansible_distribution_release }}"]
+        components: [stable]
+        state: present
+        enabled: yes
+
+    - name: add kubernetes source
+      become: true
+      ansible.builtin.deb822_repository:
+        name: kubernetes 
+        types: [deb]
+        uris: "https://pkgs.k8s.io/core:/stable:/v1.30/deb/"
+        signed_by: "https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key"
+        suites: [/]
+        state: present
+        enabled: yes
+
+    - name: install packages
+      become: true
+      apt:
+        pgk:
+        - git
+        - emacs28
+        - gcloud
+        - docker-ce
+        - docker-ce-cli
+        - kubectl
+        - gcc
+        - make
+        update_cache: "yes"
+
+- name: install non apt packages
+  hosts: localhost
+  connection: local
+
+  vars:
+    pyenv_root = "~/.pyenv"
+
+  tasks:
+
+    - name: install pyenv
+      block:
+        - name: checkout pyenv
+          ansible.builtin.git:
+            repo: https://github.com/pyenv/pyenv.git
+            dest: "{{ pyenv_root }}"
+            single_branch: yes
+            version: master
+            depth: 1
+        - name: checkout pyenv update 
+          ansible.builtin.git:
+            repo: https://github.com/pyenv/pyenv-update.git
+            dest: "{{ pyenv_root }}/plugins/pyenv-update"
+            single_branch: yes
+            version: master
+            depth: 1
+        - name: checkout pyenv virtualenv
+          ansible.builtin.git:
+            repo: https://github.com/pyenv/pyenv-virtualenv.git
+            dest: "{{ pyenv_root }}/plugins/pyenv-virtualenv"
+            single_branch: yes
+            version: master
+            depth: 1
