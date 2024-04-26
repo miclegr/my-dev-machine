@@ -34,6 +34,16 @@
         remote_src: true
         src: '~/.ssh/{{ git_key_name }}.pub'
         dest: "{{ output_folder }}/{{ git_key_name }}.pub"
+    - name: add block to ssh config for github
+      blockinfile:
+        path: "~/.ssh/config"
+        prepend_newline: true
+        block: |
+          Host github.com
+            Hostname github.com
+            IdentityFile ~/.ssh/{{ git_key_name }}
+        state: present
+        create: true
 
 - name: update system
   hosts: localhost
@@ -155,6 +165,26 @@
         state: present
         create: true
 
+    - name: install python build suite
+      become: true
+      apt:
+        pkg:
+        - build-essential 
+        - libssl-dev 
+        - zlib1g-dev
+        - libbz2-dev
+        - libreadline-dev
+        - libsqlite3-dev
+        - curl
+        - libncursesw5-dev
+        - xz-utils
+        - tk-dev
+        - libxml2-dev
+        - libxmlsec1-dev
+        - libffi-dev
+        - liblzma-dev
+        update_cache: "yes"
+
 - name: install nvim
   hosts: localhost
   connection: local
@@ -174,3 +204,45 @@
         src: /usr/local/nvim-linux64/bin/nvim
         dest: /usr/bin/nvim
         state: link
+
+- name: install atuinsh
+  hosts: localhost
+  connection: local
+
+  vars:
+    blesh_root: "~/.blesh"
+
+  tasks:
+
+    - name: install atuinsh deb file
+      become: true
+      apt:
+        deb: https://github.com/atuinsh/atuin/releases/download/v18.2.0/atuin_18.2.0_amd64.deb
+    
+    - name: install ble.sh
+      block:
+      
+        - name: checkout ble.sh repo
+          ansible.builtin.git:
+            repo: https://github.com/akinomyoga/ble.sh.git
+            dest: "{{ blesh_root }}"
+            single_branch: yes
+            version: master
+            depth: 1
+
+        - name: run ble.sh makefile
+          community.general.make:
+            chdir: "{{ blesh_root }}"
+            target: install 
+            params:
+              PREFIX: ~/.local
+
+    - name: add block to bashrc
+      blockinfile:
+        path: "~/.bashrc"
+        prepend_newline: true
+        block: |
+          source ~/.local/share/blesh/ble.sh
+          eval "$(atuin init bash)"
+        state: present
+        create: true
