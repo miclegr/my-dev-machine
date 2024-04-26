@@ -1,0 +1,18 @@
+{
+    "python.pythonPath": "~/python_for_nvim.sh",
+    "yaml.schemas": {
+        "kubernetes": "/kubernetes/*"
+    },
+	"languageserver": {
+		"terraform": {
+			"command": "terraform-ls",
+			"args": ["serve"],
+			"filetypes": [
+				"terraform",
+				"tf"
+			],
+			"initializationOptions": {},
+			"settings": {}
+		}
+	},
+}
