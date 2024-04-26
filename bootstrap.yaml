@@ -112,6 +112,7 @@
       become: true
       apt:
         pkg:
+        - net-tools
         - git
         - emacs
         - google-cloud-cli
@@ -120,6 +121,7 @@
         - kubectl
         - gcc
         - make
+        - npm
         update_cache: "yes"
 
 - name: install non apt packages
@@ -169,7 +171,6 @@
       become: true
       apt:
         pkg:
-        - net-tools
         - build-essential 
         - libssl-dev 
         - zlib1g-dev
@@ -247,3 +248,14 @@
           eval "$(atuin init bash)"
         state: present
         create: true
+
+- name: copy configs
+  hosts: localhost
+  connection: local
+
+  tasks:
+
+    - name: copy nvim config
+      ansible.builtin.copy:
+        src: config/nvim
+        dest: "~/.config"
