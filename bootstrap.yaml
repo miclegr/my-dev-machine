@@ -169,6 +169,7 @@
       become: true
       apt:
         pkg:
+        - net-tools
         - build-essential 
         - libssl-dev 
         - zlib1g-dev
