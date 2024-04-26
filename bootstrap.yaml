@@ -63,11 +63,6 @@
         - software-properties-common
         update_cache: "yes"
 
-    - name: add emacs ppa
-      become: true
-      ansible.builtin.apt_repository:
-        repo: ppa:kelleyk/emacs
-
     - name: add gcloud source
       become: true
       ansible.builtin.deb822_repository:
@@ -106,10 +101,10 @@
     - name: install packages
       become: true
       apt:
-        pgk:
+        pkg:
         - git
-        - emacs28
-        - gcloud
+        - emacs
+        - google-cloud-cli
         - docker-ce
         - docker-ce-cli
         - kubectl
@@ -122,7 +117,7 @@
   connection: local
 
   vars:
-    pyenv_root = "~/.pyenv"
+    pyenv_root: "~/.pyenv"
 
   tasks:
 
@@ -149,3 +144,33 @@
             single_branch: yes
             version: master
             depth: 1
+
+    - name: add block to bashrc
+      blockinfile:
+        path: "~/.bashrc"
+        block: |
+          echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+          echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+          echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+        state: present
+        create: true
+
+- name: install nvim
+  hosts: localhost
+  connection: local
+
+  tasks:
+
+    - name: download & untar
+      become: true
+      ansible.builtin.unarchive:
+        src: https://github.com/neovim/neovim/releases/download/v0.9.5/nvim-linux64.tar.gz
+        dest: /usr/local
+        creates: /usr/local/nvim-linux64
+        remote_src: yes
+    - name: create link
+      become: true
+      ansible.builtin.file:
+        src: /usr/local/nvim-linux64/bin/nvim
+        dest: /usr/bin/nvim
+        state: link
