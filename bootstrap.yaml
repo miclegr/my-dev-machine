@@ -160,10 +160,11 @@
     - name: add block to bashrc
       blockinfile:
         path: "~/.bashrc"
+        marker: "# {mark} ansible block 1"
         block: |
-          echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
-          echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
-          echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+          export PYENV_ROOT="$HOME/.pyenv"
+          command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+          eval "$(pyenv init -)"
         state: present
         create: true
 
@@ -207,6 +208,20 @@
         dest: /usr/bin/nvim
         state: link
 
+- name: install spacemacs
+  hosts: localhost
+  connection: local
+
+  tasks:
+
+    - name: clone repo
+      ansible.builtin.git:
+        repo: https://github.com/syl20bnr/spacemacs.git
+        dest: ~/.emacs.d
+        single_branch: yes
+        version: master
+        depth: 1
+
 - name: install atuinsh
   hosts: localhost
   connection: local
@@ -219,7 +234,7 @@
     - name: install atuinsh deb file
       become: true
       apt:
-        deb: https://github.com/atuinsh/atuin/releases/download/v18.2.0/atuin_18.2.0_amd64.deb
+        deb: https://github.com/atuinsh/atuin/releases/download/v17.2.0/atuin_17.2.0_amd64.deb
     
     - name: install ble.sh
       block:
@@ -242,6 +257,7 @@
     - name: add block to bashrc
       blockinfile:
         path: "~/.bashrc"
+        marker: "# {mark} ansible block 2"
         prepend_newline: true
         block: |
           source ~/.local/share/blesh/ble.sh
