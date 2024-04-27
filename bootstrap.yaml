@@ -219,7 +219,7 @@
         repo: https://github.com/syl20bnr/spacemacs.git
         dest: ~/.emacs.d
         single_branch: yes
-        version: master
+        version: develop
         depth: 1
 
 - name: install atuinsh
@@ -275,3 +275,8 @@
       ansible.builtin.copy:
         src: config/nvim
         dest: "~/.config"
+
+    - name: copy nvim config
+      ansible.builtin.copy:
+        src: config/emacs/.spacemacs
+        dest: "~/.spacemacs"
