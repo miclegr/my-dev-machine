@@ -205,6 +205,11 @@
             dest: /usr/bin/jira
             state: link
 
+    - name: install gh
+      become: true
+      apt:
+        deb: https://github.com/cli/cli/releases/download/v2.48.0/gh_2.48.0_linux_amd64.deb
+
 
 - name: install nvim
   hosts: localhost
