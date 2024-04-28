@@ -122,7 +122,6 @@
         - gcc
         - make
         - npm
-        - tmux
         update_cache: "yes"
 
 - name: install non apt packages
@@ -284,6 +283,27 @@
         state: present
         create: true
 
+- name: install tmux
+  hosts: localhost
+  connection: local
+
+  tasks:
+
+    - name: install package
+      become: true
+      apt:
+        pkg:
+        - tmux
+        update_cache: "yes"
+
+    - name: install tpm
+      ansible.builtin.git:
+        repo: https://github.com/tmux-plugins/tpm.git
+        dest: "~/.tmux/plugins/tpm"
+        single_branch: yes
+        version: master
+        depth: 1
+
 - name: copy configs
   hosts: localhost
   connection: local
@@ -299,3 +319,8 @@
       ansible.builtin.copy:
         src: config/emacs/.spacemacs
         dest: "~/.spacemacs"
+
+    - name: copy tmux config
+      ansible.builtin.copy:
+        src: config/tmux/.tmux.conf
+        dest: "~/.tmux.conf"
