@@ -122,6 +122,7 @@
         - gcc
         - make
         - npm
+        - ripgrep
         update_cache: "yes"
 
 - name: install non apt packages
