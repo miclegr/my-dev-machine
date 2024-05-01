@@ -22,7 +22,7 @@ return {
 			vim.o.timeout = true
 			vim.o.timeoutlen = 300
 		end,
-		-- opts = {}, -- uncomment to enable which-key
+		opts = {},
 	},
 	{ "sindrets/diffview.nvim", dependencies = { "nvim-tree/nvim-web-devicons" } },
 	{ "christoomey/vim-tmux-navigator", lazy = false },

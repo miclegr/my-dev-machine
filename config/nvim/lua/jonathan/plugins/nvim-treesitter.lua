@@ -20,10 +20,6 @@ return {
 				"json",
 				"javascript",
 				"typescript",
-				"apex",
-				"sosl",
-				"soql",
-				"tsx",
 				"yaml",
 				"html",
 				"css",
@@ -36,6 +32,7 @@ return {
 				"vim",
 				"dockerfile",
 				"gitignore",
+        "python"
 			},
 			-- auto install above language parsers
 			auto_install = true,

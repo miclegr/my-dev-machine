@@ -17,8 +17,11 @@ return {
 			-- configure custom mappings
 			defaults = {
         layout_config = {
+          scroll_speed = 1,
           horizontal = {
             preview_cutoff = 0,
+            preview_width = 0.5,
+            width = 0.99,
           },
         },
 				mappings = {
@@ -39,6 +42,8 @@ return {
 							local height = vim.api.nvim_win_get_height(results_win)
 							action_set.shift_selection(prompt_bufnr, -math.floor(height / 2))
 						end,
+            ["<C-Down>"] = actions.preview_scrolling_down,
+            ["<C-Up>"] = actions.preview_scrolling_up,
 					},
 					n = {
 						["<C-c>"] = actions.close,
@@ -56,6 +61,8 @@ return {
 							local height = vim.api.nvim_win_get_height(results_win)
 							action_set.shift_selection(prompt_bufnr, -math.floor(height / 2))
 						end,
+            ["<C-Down>"] = actions.preview_scrolling_down,
+            ["<C-Up>"] = actions.preview_scrolling_up,
 					},
 				},
 			},
@@ -68,6 +75,11 @@ return {
 					-- the default case_mode is "smart_case"
 				},
 			},
+      pickers = {
+        find_files = {
+          disable_devicons = true
+        }
+      }
 		})
 
 		telescope.load_extension("fzf")

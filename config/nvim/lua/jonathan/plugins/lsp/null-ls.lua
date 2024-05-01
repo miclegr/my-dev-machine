@@ -23,29 +23,9 @@ return {
 				formatting.sql_formatter.with({ -- install with npm -g (see https://github.com/sql-formatter-org/sql-formatter#readme)
 					extra_args = { "--config", '{"language": "postgresql", "tabWidth": 2, "keywordCase": "upper"}' },
 				}),
-				formatting.prettier.with({
-					extra_filetypes = { "apex" },
-				}), -- js/ts/apex formatter
+				formatting.prettier, -- js/ts/apex formatter
 				formatting.stylua, -- lua formatter
-				diagnostics.pmd.with({
-					filetypes = { "apex" },
-					condition = function(utils)
-						local result = utils.root_has_file("rulesets/apex/pmd-apex-ruleset.xml") -- doesn't work with git worktree unfortunately
-						return result
-					end,
-					args = function(params)
-						return {
-							"--format",
-							"json",
-							"--rulesets",
-							"rulesets/apex/pmd-apex-ruleset.xml", -- path to ruleset in sfdx-spotifyb2b
-							"--dir",
-							params.bufname,
-							"--cache",
-							vim.fn.stdpath("cache") .. "/pmd-cache",
-						}
-					end,
-				}),
+				diagnostics.pmd,
 			},
 			-- configure format on save
 			on_attach = function(current_client, bufnr)

@@ -13,6 +13,9 @@ return {
 		-- partially inspired by: https://github.com/nvim-tree/nvim-tree.lua/wiki/Recipes#modify-you-on_attach-function-to-have-ability-to-operate-multiple-files-at-once
 		-- didn't implement all the methods since bulk actions are supported out of the box (bm = bulk move, bd = bulk delete, bt = bulk trash)
 		nvimtree.setup({
+      view = {
+        width = 30,
+      },
 			renderer = {
 				icons = {
 					glyphs = {
@@ -70,7 +73,7 @@ return {
 					window_picker = {
 						enable = false,
 					},
-					resize_window = false,
+					resize_window = true,
 				},
 			},
 			sync_root_with_cwd = true, -- changes the root directory to the worktree directory when changing worktrees with git-worktree
