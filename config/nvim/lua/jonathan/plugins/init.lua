@@ -22,7 +22,13 @@ return {
 			vim.o.timeout = true
 			vim.o.timeoutlen = 300
 		end,
-		opts = {},
+		opts = {
+      triggers_blacklist = {
+        i = { "j", "k" },
+        v = { "j", "k" },
+        n = {"v", "z"},
+      },
+    },
 	},
 	{ "sindrets/diffview.nvim", dependencies = { "nvim-tree/nvim-web-devicons" } },
 	{ "christoomey/vim-tmux-navigator", lazy = false },

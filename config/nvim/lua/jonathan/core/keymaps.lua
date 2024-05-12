@@ -37,7 +37,12 @@ keymap.set("n", "<leader>se", "<C-w>=") -- make split windows equal width & heig
 keymap.set("n", "<leader>sx", ":close<CR>") -- close current split window
 keymap.set("n", "<leader>on", ":vnew<CR>") -- open a new split window
 
-keymap.set("n", "qq", ":q<CR>") -- open a new split window
+keymap.set("n", "qq", ":q<CR>") -- close window
+vim.api.nvim_create_user_command('WQ', 'wq', {})
+vim.api.nvim_create_user_command('Wq', 'wq', {})
+vim.api.nvim_create_user_command('W', 'w', {})
+vim.api.nvim_create_user_command('Qa', 'qa', {})
+vim.api.nvim_create_user_command('Q', 'q', {})
 
 -- tabs
 keymap.set("n", "<leader>tn", ":tabnew<CR>") -- open new tab
