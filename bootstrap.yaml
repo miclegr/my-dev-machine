@@ -108,6 +108,18 @@
         state: present
         enabled: yes
 
+    - name: add terraform source
+      become: true
+      ansible.builtin.deb822_repository:
+        name: haschicorp
+        types: [deb]
+        uris: "https://apt.releases.hashicorp.com"
+        signed_by: "https://apt.releases.hashicorp.com/gpg"
+        suites: ["{{ ansible_distribution_release }}"]
+        components: [main]
+        state: present
+        enabled: yes
+
     - name: install packages
       become: true
       apt:
@@ -124,6 +136,7 @@
         - npm
         - ripgrep
         - cmake
+        - terraform
         - openjdk-17-jdk
         - openjdk-17-jre
         update_cache: "yes"
