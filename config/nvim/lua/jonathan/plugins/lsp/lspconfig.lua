@@ -86,6 +86,77 @@ return {
 			on_attach = on_attach,
 		})
 
+		-- configure java server
+		lspconfig["jdtls"].setup({
+			capabilities = capabilities,
+			on_attach = on_attach,
+      settings = {
+        java = {
+          home = vim.fn.expand("$HOME/.sdkman/candidates/java/current"), -- java home
+          eclipse = {
+            downloadSources = true,
+          },
+          configuration = {
+            updateBuildConfiguration = "interactive",
+            runtimes = {
+              {
+                name = "current",
+                path = vim.fn.expand("$HOME/.sdkman/candidates/java/current"),
+              },
+            },
+          },
+          maven = {
+            downloadSources = true,
+          },
+          implementationsCodeLens = {
+            enabled = true,
+          },
+          referencesCodeLens = {
+            enabled = true,
+          },
+          references = {
+            includeDecompiledSources = true,
+          },
+          format = {
+            enabled = false, -- format on save (this doesn't seem to work consistently) see https://github.com/mfussenegger/nvim-jdtls/issues/533 for a potential solution
+          },
+        },
+        signatureHelp = { enabled = true },
+        completion = {
+          favoriteStaticMembers = {
+            "org.hamcrest.MatcherAssert.assertThat",
+            "org.hamcrest.Matchers.*",
+            "org.hamcrest.CoreMatchers.*",
+            "org.junit.jupiter.api.Assertions.*",
+            "java.util.Objects.requireNonNull",
+            "java.util.Objects.requireNonNullElse",
+            "org.mockito.Mockito.*",
+          },
+          importOrder = {
+            "java",
+            "javax",
+            "com",
+            "org",
+          },
+        },
+        extendedClientCapabilities = {
+          classFileContentsSupport = true,
+        },
+        sources = {
+          organizeImports = {
+            starThreshold = 9999,
+            staticStarThreshold = 9999,
+          },
+        },
+        codeGeneration = {
+          toString = {
+            template = "${object.className}{${member.name()}=${member.value}, ${otherMembers}}",
+          },
+          useBlocks = true,
+        },
+      },
+    })
+
 		-- configure lua server
 		lspconfig["lua_ls"].setup({
 			on_attach = on_attach,

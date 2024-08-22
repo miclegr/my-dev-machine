@@ -137,8 +137,6 @@
         - ripgrep
         - cmake
         - terraform
-        - openjdk-17-jdk
-        - openjdk-17-jre
         update_cache: "yes"
 
 - name: install non apt packages
@@ -226,6 +224,11 @@
       become: true
       apt:
         deb: https://github.com/cli/cli/releases/download/v2.48.0/gh_2.48.0_linux_amd64.deb
+
+    - name: install sdkman 
+      ansible.builtin.shell: curl -s "https://get.sdkman.io" | bash
+      args:
+        creates: "~/.sdkman"
 
 
 - name: install nvim
