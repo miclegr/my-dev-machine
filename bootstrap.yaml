@@ -67,6 +67,9 @@
       become: true
       apt:
         pkg:
+        - unzip
+        - zip
+        - python3-debian
         - apt-transport-https 
         - ca-certificates 
         - curl 
