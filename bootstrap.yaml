@@ -131,6 +131,7 @@
         - git
         - emacs
         - google-cloud-cli
+        - google-cloud-cli-gke-gcloud-auth-plugin
         - docker-ce
         - docker-ce-cli
         - kubectl
