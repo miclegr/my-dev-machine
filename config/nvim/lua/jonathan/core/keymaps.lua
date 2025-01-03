@@ -72,6 +72,7 @@ keymap.set("n", "<leader>qc", "<CMD>cexpr []<CR>") -- clear the quickfix list
 -- Plugin Keybinds --
 ---------------------
 keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>")
+keymap.set("n", "<leader>w", ":CopilotChatToggle<CR>")
 
 -- Git
 keymap.set("n", "<leader>gb", ":Git<Space>blame<CR>")
