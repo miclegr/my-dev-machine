@@ -333,6 +333,26 @@
         version: master
         depth: 1
 
+- name: install lazyvim
+  hosts: localhost
+  connection: local
+
+  tasks:
+
+    - name: download & untar
+      become: true
+      ansible.builtin.unarchive:
+        src: https://github.com/jesseduffield/lazygit/releases/download/v0.44.1/lazygit_0.44.1_Linux_x86_64.tar.gz
+        dest: /usr/local
+        creates: /usr/local/lazygit
+        remote_src: yes
+    - name: create link
+      become: true
+      ansible.builtin.file:
+        src: /usr/local/lazygit
+        dest: /usr/bin/lazygit
+        state: link
+
 - name: copy configs
   hosts: localhost
   connection: local
