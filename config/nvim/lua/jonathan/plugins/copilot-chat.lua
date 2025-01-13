@@ -26,6 +26,7 @@ return {
           end,
         },
       },
+      model = 'claude-3.5-sonnet'
     },
   },
 }
