@@ -22,7 +22,6 @@ return {
 			vim.o.timeout = true
 			vim.o.timeoutlen = 300
 		end,
-    },
 	},
 	{ "sindrets/diffview.nvim", dependencies = { "nvim-tree/nvim-web-devicons" } },
 	{ "christoomey/vim-tmux-navigator", lazy = false },
@@ -65,5 +64,17 @@ return {
       vim.keymap.set('n', '<leader>cc', '<leader>c_', {remap = true})
       vim.keymap.set('v', '<leader>c', require('osc52').copy_visual)
     end
-  }
+  },
+  {
+  'stevearc/aerial.nvim',
+	config = function()
+    require('aerial').setup {
+    }
+    vim.keymap.set('n', '<leader>fo', "<cmd>AerialToggle!<CR>")
+  end,
+  dependencies = {
+     "nvim-treesitter/nvim-treesitter",
+     "nvim-tree/nvim-web-devicons"
+  },
+}
 }
