@@ -89,23 +89,39 @@ return {
 		})
 
 		-- configure java server
+
+    local function get_jdtls_cache_dir()
+      return vim.loop.os_homedir() .. '/.cache/jdtls'
+    end
+
+    local function get_jdtls_config_dir()
+      return get_jdtls_cache_dir() .. '/config'
+    end
+
+    local function get_jdtls_workspace_dir()
+      return get_jdtls_cache_dir() .. '/workspace'
+    end
+
 		lspconfig["jdtls"].setup({
 			capabilities = capabilities,
 			on_attach = on_attach,
       settings = {
         java = {
           home = vim.fn.expand("$HOME/.sdkman/candidates/java/current"), -- java home
+          cmd = {
+            'jdtls',
+            '-Dlog.protocol=true',
+            '-Dlog.level=ALL',
+            '-configuration',
+            get_jdtls_config_dir(),
+            '-data',
+            get_jdtls_workspace_dir(),
+          },
           eclipse = {
             downloadSources = true,
           },
           configuration = {
             updateBuildConfiguration = "interactive",
-            runtimes = {
-              {
-                name = "current",
-                path = vim.fn.expand("$HOME/.sdkman/candidates/java/current"),
-              },
-            },
           },
           maven = {
             downloadSources = true,

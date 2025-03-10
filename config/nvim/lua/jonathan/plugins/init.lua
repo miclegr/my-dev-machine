@@ -39,8 +39,6 @@ return {
 		"rcarriga/cmp-dap",
 		event = { "BufReadPre", "BufNewFile" },
 	},
-	-- java
-	{ "mfussenegger/nvim-jdtls" },
 	-- markdown preview
 	{
 		"iamcco/markdown-preview.nvim",
