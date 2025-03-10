@@ -84,7 +84,7 @@ keymap.set("n", "<leader>dc", ":DiffviewClose<CR>")
 keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
 
 -- Trouble
-keymap.set("n", "<leader>rr",":TroubleToggle document_diagnostics<CR>")
+keymap.set("n", "<leader>rr",":Trouble diagnostics toggle filter.buf=0<CR>")
 
 ---------------
 -- Debugging --
