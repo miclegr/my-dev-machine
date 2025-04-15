@@ -75,6 +75,24 @@ return {
   dependencies = {
      "nvim-treesitter/nvim-treesitter",
      "nvim-tree/nvim-web-devicons"
+   },
   },
-}
+  {
+    "echasnovski/mini.diff",
+    config = function()
+      local diff = require("mini.diff")
+      diff.setup({
+        source = diff.gen_source.none(),
+        view = {
+          style = 'sign',
+        }
+      })
+    end,
+  },
+  {
+    "Davidyz/VectorCode",
+     version = "*",
+     build = "pipx upgrade vectorcode",
+     dependencies = { "nvim-lua/plenary.nvim" },
+  },
 }
