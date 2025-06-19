@@ -80,6 +80,33 @@ return {
 			-- see here: https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#pyright
 		})
 
+		-- configure ts server
+		lspconfig["ts_ls"].setup({
+			init_options = {
+				-- relative imports
+				preferences = {
+					importModuleSpecifierPreference = "relative",
+					importModuleSpecifierEnding = "minimal",
+				},
+				plugins = {},
+			},
+			filetypes = {
+				"javascript",
+				"typescript",
+				"typescriptreact",
+				"javascriptreact",
+				"vue",
+			},
+			capabilities = capabilities,
+			on_attach = on_attach,
+		})
+
+		-- configure css server
+		lspconfig["cssls"].setup({
+			capabilities = capabilities,
+			on_attach = on_attach,
+		})
+
 		-- configure bash server
 		lspconfig["bashls"].setup({
 			capabilities = capabilities,
