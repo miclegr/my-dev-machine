@@ -244,14 +244,14 @@
     - name: download & untar
       become: true
       ansible.builtin.unarchive:
-        src: https://github.com/neovim/neovim/releases/download/v0.10.3/nvim-linux64.tar.gz
+        src: https://github.com/neovim/neovim/releases/download/v0.11.2/nvim-linux-x86_64.tar.gz
         dest: /usr/local
-        creates: /usr/local/nvim-linux64
+        creates: /usr/local/nvim-linux-x86_64
         remote_src: yes
     - name: create link
       become: true
       ansible.builtin.file:
-        src: /usr/local/nvim-linux64/bin/nvim
+        src: /usr/local/nvim-linux-x86_64/bin/nvim
         dest: /usr/bin/nvim
         state: link
 
