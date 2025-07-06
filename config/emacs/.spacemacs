@@ -583,7 +583,7 @@ configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
 
-(setq browse-url-browser-function 'eww-browse-url)
+(setq browse-url-browser-function 'browse-url-xdg-open)
 
 (setq helm-window-prefer-horizontal-split 'decide)
 (setq split-height-threshold 0)
