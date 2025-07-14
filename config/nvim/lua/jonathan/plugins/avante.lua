@@ -6,10 +6,21 @@ return {
     provider = "gemini",
     providers = {
         gemini = {
-        model = "gemini-2.5-pro",
-        temperature = 0.1,
+        model = "gemini-2.5-flash",
+      },
+      copilot = {
+        hide_in_model_selector = true
       }
     },
+    windows = {
+      width = 35,
+      sidebar_header = {
+        enabled = true
+      },
+      input = {
+        height = 15
+      }
+    }
   },
   build = "make",
   dependencies = {
