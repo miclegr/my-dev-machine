@@ -12,6 +12,13 @@ return {
 		local state = require("telescope.state")
 		local action_set = require("telescope.actions.set")
 
+    local fzf_opts = {
+      fuzzy = true,                    -- false will only do exact matching
+      override_generic_sorter = true,  -- override the generic sorter
+      override_file_sorter = true,     -- override the file sorter
+      case_mode = "smart_case",        -- or "ignore_case" or "respect_case"
+    }
+
 		-- configure telescope
 		telescope.setup({
 			-- configure custom mappings
@@ -67,18 +74,15 @@ return {
 				},
 			},
 			extensions = {
-				fzf = {
-					fuzzy = true, -- false will only do exact matching
-					override_generic_sorter = true, -- override the generic sorter
-					override_file_sorter = true, -- override the file sorter
-					case_mode = "smart_case", -- or "ignore_case" or "respect_case"
-					-- the default case_mode is "smart_case"
-				},
-			},
+				fzf = fzf_opts,
+      },
       pickers = {
         find_files = {
           disable_devicons = true
-        }
+        },
+        lsp_dynamic_workspace_symbols = {
+          sorter = telescope.extensions.fzf.native_fzf_sorter(fzf_opts)
+        },
       }
 		})
 
@@ -119,7 +123,8 @@ return {
 		-- <C-q> opens the current files in the quickfix list (already mapped)
 		keymap.set("n", "<leader>ff", "<CMD>Telescope find_files<CR>") -- find files within current working directory, respects .gitignore
 		keymap.set("n", "<leader>fs", "<CMD>Telescope live_grep<CR>") -- find string in current working directory as you type
-		keymap.set("n", "<leader>fc", "<CMD>Telescope grep_string<CR>") -- find string under cursor in current working directory
+		keymap.set("n", "<leader>fc", "<CMD>Telescope lsp_dynamic_workspace_symbols symbols=class<CR>") 
+		keymap.set("n", "<leader>fm", "<CMD>Telescope lsp_dynamic_workspace_symbols symbols=method<CR>") 
 		keymap.set("n", "<leader>fb", "<CMD>Telescope buffers sort_mru=true<CR>") -- list open buffers in current neovim instance
 		keymap.set("n", "<leader>fh", "<CMD>Telescope help_tags<CR>") -- list available help tags
 		keymap.set("n", "<leader>fk", "<CMD>Telescope keymaps<CR>") -- list available help tags
