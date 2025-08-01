@@ -18,12 +18,6 @@ local function format_file()
 	vim.lsp.buf.format()
 end
 
--- format xml
-keymap.set("n", "<leader>fx", ":%!xmllint '%' --format<CR>")
-
--- format json
-keymap.set("n", "<leader>fj", format_json)
-
 -- format current file
 keymap.set("n", "<leader>F", format_file)
 
@@ -78,6 +72,7 @@ keymap.set("n", "<leader>w", ":CopilotChatToggle<CR>")
 keymap.set("n", "<leader>gb", ":Git<Space>blame<CR>")
 keymap.set("n", "<leader>gg", ":G<CR>") -- Opens the fugitive window (dd can be used for vertical diff, select a file in the fugitive window to exit)
 keymap.set("n", "<leader>do", ":DiffviewOpen<CR>")
+keymap.set("n", "<leader>dm", ":DiffviewOpen master<CR>")
 keymap.set("n", "<leader>dc", ":DiffviewClose<CR>")
 
 -- toggle undo tree
@@ -85,6 +80,11 @@ keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
 
 -- Trouble
 keymap.set("n", "<leader>rr",":Trouble diagnostics toggle filter.buf=0<CR>")
+
+-- Aeral
+keymap.set('n', '<leader>fo', "<cmd>AerialToggle!<CR>")
+keymap.set('n', '<leader>fp', "<cmd>AerialNavToggle<CR>")
+
 
 ---------------
 -- Debugging --
