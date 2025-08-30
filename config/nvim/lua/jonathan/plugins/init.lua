@@ -3,6 +3,9 @@ return {
 	{
 		"nvim-lua/plenary.nvim",
 	}, -- Lua functions that many other plugins depend on
+	{
+		"EdenEast/nightfox.nvim",
+	},
 	-- {
 	-- 	"LunarVim/bigfile.nvim", -- Could be useful for large files
 	-- },
