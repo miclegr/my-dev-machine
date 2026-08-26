@@ -179,6 +179,17 @@ vim.api.nvim_create_user_command("Cppath", function()
 	vim.notify('Copied "' .. path .. '" to the clipboard!')
 end, {})
 
+keymap.set("n", "<leader>yp", function()
+	local path = vim.fn.expand("%:.")
+	vim.fn.setreg("+", path)
+	vim.notify('Copied "' .. path .. '" to the clipboard!')
+end)
+keymap.set("n", "<leader>yP", function()
+	local path = vim.fn.expand("%:p")
+	vim.fn.setreg("+", path)
+	vim.notify('Copied "' .. path .. '" to the clipboard!')
+end)
+
 -- markdown preview
 keymap.set("n", "<leader>md", ":MarkdownPreview<CR>")
 keymap.set("n", "<leader>ms", ":MarkdownPreviewStop<CR>")

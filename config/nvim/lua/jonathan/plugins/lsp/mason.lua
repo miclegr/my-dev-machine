@@ -24,7 +24,6 @@ return {
 				"lua_ls",
 				"jdtls",
 				"bashls",
-				"pyright",
 				"sqlls",
         "clangd",
 			},

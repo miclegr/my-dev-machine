@@ -2,7 +2,6 @@ return {
 	"neovim/nvim-lspconfig", -- in-built Neovim LSP
 	dependencies = {
 		"hrsh7th/cmp-nvim-lsp", -- autocompletion
-		"jose-elias-alvarez/typescript.nvim", -- additional functionality for typescript server (e.g. rename file & update imports)
 	},
 	config = function()
 		-- disable lsp logs ("off") unless needed so it doesn't create a huge file (switch to "debug" if needed)
@@ -30,13 +29,6 @@ return {
 			keymap.set("n", "èd", "<cmd>Lspsaga diagnostic_jump_prev<CR>", opts) -- jump to previous diagnostic in buffer
 			keymap.set("n", "+d", "<cmd>Lspsaga diagnostic_jump_next<CR>", opts) -- jump to next diagnostic in buffer
 			keymap.set("n", "K", "<cmd>Lspsaga hover_doc<CR>", opts) -- show documentation for what is under cursor
-
-			-- typescript specific keymaps (e.g. rename file and update imports)
-			if client.name == "tsserver" then
-				keymap.set("n", "<leader>rf", ":TypescriptRenameFile<CR>") -- rename file and update imports
-				keymap.set("n", "<leader>oi", ":TypescriptOrganizeImports<CR>") -- organize imports
-				keymap.set("n", "<leader>ru", ":TypescriptRemoveUnused<CR>") -- remove unused variables
-			end
 		end
 
 		-- used to enable autocompletion (assign to every lsp server config)
@@ -62,23 +54,48 @@ return {
       filetypes = {"c", "cpp", "objc", "objcpp", "cuda", "proto", "hpp"}
 		})
 
-		-- configure python server
-		lspconfig["pyright"].setup({
-			capabilities = capabilities,
-			on_attach = on_attach,
-			filetypes = { "python" },
-			settings = {
-				pyright = { autoImportCompletion = true }, -- see settings here: https://github.com/microsoft/pyright/blob/main/docs/settings.md
-				python = {
-					analysis = {
-						autoSearchPaths = true,
-						diagnosticMode = "openFilesOnly",
-						useLibraryCodeForTypes = true,
+		-- self-contained ty install (python type checker + LSP from astral-sh/ty)
+		local ty_dir = vim.fn.stdpath("data") .. "/ty"
+		local ty_bin = ty_dir .. "/ty"
+
+		local function ensure_ty()
+			if vim.uv.fs_stat(ty_bin) then
+				return ty_bin
+			end
+			vim.fn.mkdir(ty_dir, "p")
+			local url = "https://github.com/astral-sh/ty/releases/latest/download/ty-x86_64-unknown-linux-gnu.tar.gz"
+			vim.fn.system({ "sh", "-c", ("curl -LsSf '%s' | tar -xz -C '%s' --strip-components=1"):format(url, ty_dir) })
+			if vim.v.shell_error ~= 0 or not vim.uv.fs_stat(ty_bin) then
+				vim.notify("ty LSP: failed to install binary", vim.log.levels.ERROR)
+				return nil
+			end
+			return ty_bin
+		end
+
+		local ty_bin = ensure_ty()
+		if ty_bin then
+			local configs = require("lspconfig.configs")
+			if not configs.ty then
+				configs.ty = {
+					default_config = {
+						cmd = { ty_bin, "server" },
+						filetypes = { "python" },
+						root_dir = function(fname)
+							return lspconfig.util.root_pattern(
+								"ty.toml", "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", ".git"
+							)(fname)
+						end,
 					},
-				},
-			}, -- could probably get it to work with pyproject.toml by overriding the "cmd" property and adding the -p flag (-p pyproject.toml)
-			-- see here: https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#pyright
-		})
+				}
+			end
+
+			-- configure python server
+			lspconfig["ty"].setup({
+				capabilities = capabilities,
+				on_attach = on_attach,
+				filetypes = { "python" },
+			})
+		end
 
 		-- configure ts server
 		lspconfig["ts_ls"].setup({

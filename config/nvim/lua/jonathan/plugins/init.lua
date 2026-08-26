@@ -30,16 +30,8 @@ return {
 	},
 	{ "sindrets/diffview.nvim", dependencies = { "nvim-tree/nvim-web-devicons" } },
 	{ "christoomey/vim-tmux-navigator", lazy = false },
-	{
-		"mg979/vim-visual-multi",
-		config = function()
-			vim.keymap.set("n", "<C-m>", "<Plug>(VM-Find-Under)")
-		end,
-	},
-	"mbbill/undotree",
 	"tpope/vim-fugitive",
 	-- makes resolving merge conflicts easy ([x maps to next conflict)
-	{ "metakirby5/codi.vim", event = { "BufReadPre", "BufNewFile" } },
 	{
 		"rcarriga/cmp-dap",
 		event = { "BufReadPre", "BufNewFile" },
@@ -85,23 +77,5 @@ return {
             }
           }
     },
-  },
-  {
-    "echasnovski/mini.diff",
-    config = function()
-      local diff = require("mini.diff")
-      diff.setup({
-        source = diff.gen_source.none(),
-        view = {
-          style = 'sign',
-        }
-      })
-    end,
-  },
-  {
-    "Davidyz/VectorCode",
-     version = "*",
-     build = "pipx upgrade vectorcode",
-     dependencies = { "nvim-lua/plenary.nvim" },
   },
 }
