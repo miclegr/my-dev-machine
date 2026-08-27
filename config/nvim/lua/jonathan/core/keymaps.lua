@@ -189,6 +189,27 @@ keymap.set("n", "<leader>yP", function()
 	vim.fn.setreg("+", path)
 	vim.notify('Copied "' .. path .. '" to the clipboard!')
 end)
+keymap.set("n", "<leader>ym", function()
+	local utils = require("jonathan.core.utils")
+	local name = utils.get_current_full_method_name()
+	if not name then
+		vim.notify("No class or method found at cursor", vim.log.levels.WARN)
+		return
+	end
+	vim.fn.setreg("+", name)
+	vim.notify('Copied "' .. name .. '" to the clipboard!')
+end)
+keymap.set("n", "<leader>yM", function()
+	local utils = require("jonathan.core.utils")
+	local path = vim.fn.expand("%:.")
+	local name = utils.get_current_full_method_name()
+	if not name then
+		vim.notify("No class or method found at cursor", vim.log.levels.WARN)
+		return
+	end
+	vim.fn.setreg("+", path .. "#" .. name)
+	vim.notify('Copied "' .. path .. "#" .. name .. '" to the clipboard!')
+end)
 
 -- markdown preview
 keymap.set("n", "<leader>md", ":MarkdownPreview<CR>")

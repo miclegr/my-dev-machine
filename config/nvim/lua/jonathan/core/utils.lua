@@ -15,30 +15,45 @@ function M.is_submodule()
 end
 
 -- Find nodes by type
-local function find_parent_by_type(expr, type_name)
+local function find_parent_by_types(expr, types)
 	while expr do
-		if expr:type() == type_name then
-			break
+		if types[expr:type()] then
+			return expr
 		end
 		expr = expr:parent()
 	end
-	return expr
+	return nil
 end
 
 -- Find child nodes by type
-local function find_child_by_type(expr, type_name)
+local function find_child_by_types(expr, types)
 	local id = 0
 	local expr_child = expr:child(id)
 	while expr_child do
-		if expr_child:type() == type_name then
-			break
+		if types[expr_child:type()] then
+			return expr_child
 		end
 		id = id + 1
 		expr_child = expr:child(id)
 	end
 
-	return expr_child
+	return nil
 end
+
+local CLASS_TYPES = {
+	class_declaration = true, -- Java
+	class_definition = true, -- Python
+}
+
+local METHOD_TYPES = {
+	method_declaration = true, -- Java
+	function_definition = true, -- Python
+}
+
+local NAME_TYPES = {
+	identifier = true,
+	name = true,
+}
 
 -- Get Current Method Name
 function M.get_current_method_name()
@@ -47,12 +62,12 @@ function M.get_current_method_name()
 		return nil
 	end
 
-	local expr = find_parent_by_type(current_node, "method_declaration")
+	local expr = find_parent_by_types(current_node, METHOD_TYPES)
 	if not expr then
 		return nil
 	end
 
-	local child = find_child_by_type(expr, "identifier")
+	local child = find_child_by_types(expr, NAME_TYPES)
 	if not child then
 		return nil
 	end
@@ -66,12 +81,12 @@ function M.get_current_class_name()
 		return nil
 	end
 
-	local class_declaration = find_parent_by_type(current_node, "class_declaration")
+	local class_declaration = find_parent_by_types(current_node, CLASS_TYPES)
 	if not class_declaration then
 		return nil
 	end
 
-	local child = find_child_by_type(class_declaration, "identifier")
+	local child = find_child_by_types(class_declaration, NAME_TYPES)
 	if not child then
 		return nil
 	end
@@ -85,16 +100,16 @@ function M.get_current_package_name()
 		return nil
 	end
 
-	local program_expr = find_parent_by_type(current_node, "program")
+	local program_expr = find_parent_by_types(current_node, { program = true })
 	if not program_expr then
 		return nil
 	end
-	local package_expr = find_child_by_type(program_expr, "package_declaration")
+	local package_expr = find_child_by_types(program_expr, { package_declaration = true })
 	if not package_expr then
 		return nil
 	end
 
-	local child = find_child_by_type(package_expr, "scoped_identifier")
+	local child = find_child_by_types(package_expr, { scoped_identifier = true })
 	if not child then
 		return nil
 	end
@@ -105,7 +120,13 @@ end
 function M.get_current_full_class_name()
 	local package = M.get_current_package_name()
 	local class = M.get_current_class_name()
-	return package .. "." .. class
+	if not class then
+		return nil
+	end
+	if package then
+		return package .. "." .. class
+	end
+	return class
 end
 
 -- Get Current Full Method Name with delimiter or default '.'
@@ -113,7 +134,13 @@ function M.get_current_full_method_name(delimiter)
 	delimiter = delimiter or "."
 	local full_class_name = M.get_current_full_class_name()
 	local method_name = M.get_current_method_name()
-	return full_class_name .. delimiter .. method_name
+	if not method_name then
+		return nil
+	end
+	if full_class_name then
+		return full_class_name .. delimiter .. method_name
+	end
+	return method_name
 end
 
 local function escape_pattern(text)
