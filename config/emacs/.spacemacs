@@ -590,6 +590,85 @@ before packages are loaded."
 (setq split-width-threshold nil)
 
 (with-eval-after-load 'org
+  ;; Terminal math: replace LaTeX fragments with unicode glyphs using
+  ;; pylatexenc.  The helper (venv + script) is installed by bootstrap.yaml.
+  ;; Fractions/roots get grouping parens; matrices collapse to one line.
+  (setq org-pretty-entities t)
+  (setq org-pretty-entities-include-sub-superscripts t)
+  (setq org-highlight-latex-and-related '(native))
+
+  (defvar org-unicode-math-python
+    (expand-file-name "~/.local/share/tex2unicode/venv/bin/python"))
+  (defvar org-unicode-math-script
+    (expand-file-name "~/.local/share/tex2unicode/tex2unicode.py"))
+  (defvar org-unicode-math-auto t
+    "Auto-render unicode math in non-graphical frames.")
+  (defvar-local org-unicode-math-overlays nil)
+
+  (defun org-unicode-math--fragments ()
+    (let (frags)
+      (org-element-map (org-element-parse-buffer) '(latex-fragment latex-environment)
+        (lambda (el)
+          (push (list (org-element-property :begin el)
+                      (org-element-property :end el)
+                      (org-element-property :value el))
+                frags)))
+      (nreverse frags)))
+
+  (defun org-unicode-math--convert (strings)
+    "Convert list of LaTeX STRINGS to unicode via the tex2unicode helper."
+    (when strings
+      (condition-case nil
+          (with-temp-buffer
+            (insert (json-serialize (vconcat strings)))
+            (call-process-region (point-min) (point-max)
+                                 org-unicode-math-python
+                                 t t nil org-unicode-math-script)
+            (json-parse-string (buffer-string) :array-type 'list))
+        (error (make-list (length strings) nil)))))
+
+  (defun org-unicode-math-clear ()
+    "Remove unicode math overlays in the current buffer."
+    (interactive)
+    (mapc #'delete-overlay org-unicode-math-overlays)
+    (setq org-unicode-math-overlays nil))
+
+  (defun org-unicode-math-render ()
+    "Overlay each LaTeX fragment with its unicode rendering."
+    (interactive)
+    (org-unicode-math-clear)
+    (let* ((frags (org-unicode-math--fragments))
+           (unis (org-unicode-math--convert (mapcar (lambda (f) (nth 2 f)) frags)))
+           (n 0))
+      (dotimes (i (length frags))
+        (let ((beg (nth 0 (nth i frags)))
+              (end (nth 1 (nth i frags)))
+              (u (nth i unis)))
+          (when (and u (not (string-empty-p (string-trim u))))
+            (let ((ov (make-overlay beg end)))
+              (overlay-put ov 'display u)
+              (overlay-put ov 'priority 1001)
+              (push ov org-unicode-math-overlays)
+              (setq n (1+ n))))))
+      (message "unicode math: %d/%d fragments" n (length frags))))
+
+  (defun org-unicode-math-toggle ()
+    "Toggle unicode rendering of LaTeX fragments."
+    (interactive)
+    (if org-unicode-math-overlays
+        (progn (org-unicode-math-clear) (message "unicode math off"))
+      (org-unicode-math-render)))
+
+  (defun org-unicode-math--on-change (&rest _)
+    (when org-unicode-math-overlays (org-unicode-math-clear)))
+
+  (define-key org-mode-map (kbd "C-c C-x C-e") #'org-unicode-math-toggle)
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (add-hook 'before-change-functions #'org-unicode-math--on-change nil t)
+              (when (and org-unicode-math-auto (not (display-graphic-p)))
+                (org-unicode-math-render))))
+
   (setq org-directory "~/org")
   (setq org-roam-directory "~/org/org-roam")
   (setq org-capture-templates

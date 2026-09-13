@@ -70,6 +70,8 @@
         - unzip
         - zip
         - python3-debian
+        - python3-venv
+        - python3-pip
         - apt-transport-https 
         - ca-certificates 
         - curl 
@@ -373,3 +375,25 @@
       ansible.builtin.copy:
         src: config/tmux/.tmux.conf
         dest: "~/.tmux.conf"
+
+- name: install emacs unicode math helper
+  hosts: localhost
+  connection: local
+
+  vars:
+    tex2unicode_root: "~/.local/share/tex2unicode"
+
+  tasks:
+
+    - name: install pylatexenc in a dedicated venv
+      ansible.builtin.pip:
+        name: pylatexenc
+        state: present
+        virtualenv: "{{ tex2unicode_root }}/venv"
+        virtualenv_command: python3 -m venv
+
+    - name: copy tex2unicode converter
+      ansible.builtin.copy:
+        src: config/emacs/tex2unicode.py
+        dest: "{{ tex2unicode_root }}/tex2unicode.py"
+        mode: "0644"
