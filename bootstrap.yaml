@@ -397,3 +397,37 @@
         src: config/emacs/tex2unicode.py
         dest: "{{ tex2unicode_root }}/tex2unicode.py"
         mode: "0644"
+
+- name: configure wsl mirrored kubefwd routes
+  hosts: localhost
+  connection: local
+
+  tasks:
+
+    - name: install kubefwd route script
+      become: true
+      ansible.builtin.copy:
+        src: config/wsl/wsl-kubefwd-route.sh
+        dest: /usr/local/sbin/wsl-kubefwd-route.sh
+        mode: "0755"
+
+    - name: install kubefwd route systemd unit
+      become: true
+      ansible.builtin.copy:
+        src: config/wsl/wsl-kubefwd-route.service
+        dest: /etc/systemd/system/wsl-kubefwd-route.service
+        mode: "0644"
+      register: kubefwd_route_unit
+
+    - name: reload systemd
+      become: true
+      ansible.builtin.systemd:
+        daemon_reload: true
+      when: kubefwd_route_unit.changed
+
+    - name: enable and start kubefwd route service
+      become: true
+      ansible.builtin.systemd:
+        name: wsl-kubefwd-route.service
+        enabled: true
+        state: started

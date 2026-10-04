@@ -1,0 +1,12 @@
+[Unit]
+Description=Route kubefwd loopback aliases to the Windows host (WSL mirrored)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/wsl-kubefwd-route.sh
+
+[Install]
+WantedBy=multi-user.target
