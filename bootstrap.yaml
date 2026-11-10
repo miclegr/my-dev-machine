@@ -376,6 +376,19 @@
         src: config/tmux/.tmux.conf
         dest: "~/.tmux.conf"
 
+    - name: copy lazygit config
+      ansible.builtin.copy:
+        src: config/lazygit
+        dest: "~/.config"
+
+    - name: make lazygit scripts executable
+      ansible.builtin.file:
+        path: "~/.config/lazygit/{{ item }}"
+        mode: "0755"
+      loop:
+        - open-in-nvim.sh
+        - copy-repo-commit.sh
+
 - name: install emacs unicode math helper
   hosts: localhost
   connection: local

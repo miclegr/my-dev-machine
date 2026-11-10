@@ -1,0 +1,13 @@
+customCommands:
+  - key: 'O'
+    context: 'files'
+    description: 'Open selected file in nvim at the viewed position'
+    command: '"$HOME/.config/lazygit/open-in-nvim.sh" {{.SelectedFile.Name | quote}}'
+    output: none
+  # lazygit 0.44.1 cannot distinguish Ctrl+Shift+O (that needs >= 0.62 and
+  # tmux extended keys), so Ctrl+G is used instead.
+  - key: '<c-g>'
+    context: 'global'
+    description: 'Copy repo root path and selected commit hash to clipboard'
+    command: '"$HOME/.config/lazygit/copy-repo-commit.sh" {{if .SelectedCommit}}{{.SelectedCommit.Hash | quote}}{{end}}'
+    output: none
