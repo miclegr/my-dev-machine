@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+    echo "Usage: $0 <path> <pyenv-virtualenv-name> [worktree]"
+    exit 1
+}
+
+[ $# -ge 2 ] && [ $# -le 3 ] || usage
+
+path="$1"
+env_name="$2"
+worktree="${3:-}"
+
+[ -d "$path" ] || { echo "Error: Directory '$path' does not exist" >&2; exit 1; }
+
+if [ -n "$worktree" ]; then
+    # Resolve to an absolute path so tmux and git agree on the location.
+    worktree="$(realpath -m "$worktree")"
+
+    if [ -d "$worktree" ]; then
+        echo "Worktree '$worktree' already exists. Using it."
+    else
+        git -C "$path" rev-parse --is-inside-work-tree >/dev/null 2>&1 \
+            || { echo "Error: '$path' is not inside a git repository" >&2; exit 1; }
+        mkdir -p "$(dirname "$worktree")"
+        git -C "$path" worktree add "$worktree"
+    fi
+
+    target="$worktree"
+else
+    target="$path"
+fi
+
+session_name="$(basename "$target")"
+
+if tmux has-session -t "$session_name" 2>/dev/null; then
+    echo "Session '$session_name' already exists. Attaching..."
+    if [ -z "${TMUX:-}" ]; then
+        tmux attach-session -t "$session_name"
+    else
+        tmux switch-client -t "$session_name"
+    fi
+    exit 0
+fi
+
+tmux new-session -d -s "$session_name" -c "$target" -n nvim
+tmux send-keys -t "$session_name:nvim" "export PYTHONPATH=src && pyenv activate $env_name && nvim" Enter
+
+tmux new-window -t "$session_name" -c "$target" -n opencode
+tmux send-keys -t "$session_name:opencode" "export PYTHONPATH=src && pyenv activate $env_name && opencode" Enter
+
+tmux new-window -t "$session_name" -c "$target" -n lazygit
+tmux send-keys -t "$session_name:lazygit" "export PYTHONPATH=src && pyenv activate $env_name && lazygit" Enter
+
+tmux new-window -t "$session_name" -c "$target" -n shell
+tmux send-keys -t "$session_name:shell" "export PYTHONPATH=src && pyenv activate $env_name" Enter
+
+tmux select-window -t "$session_name:nvim"
+
+if [ -z "${TMUX:-}" ]; then
+    tmux attach-session -t "$session_name"
+else
+    tmux switch-client -t "$session_name"
+fi
